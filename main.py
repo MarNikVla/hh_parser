@@ -30,6 +30,7 @@ def parse_user_datafile_bs(filename):
     text = read_file(filename)
 
     soup = BeautifulSoup(text)
+
     film_list = soup.find('div', {'class': 'profileFilmsList'})
     items = film_list.find_all('div', {'class': ['item', 'item even']})
     for item in items:
