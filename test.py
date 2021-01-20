@@ -1,49 +1,46 @@
 from bs4 import BeautifulSoup
+import requests
+import csv
+
+# establishing session
+session = requests.Session()
+session.headers.update({
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0'
+})
 
 
-def read_file(filename):
-    with open(filename) as input_file:
-        text = input_file.read()
-    return text
+def load_vacancy_page(session, profession=None, page=0):
+    url = 'https://spb.hh.ru/search/vacancy?L_is_autosearch=false&area=2&clusters=true' \
+          '&enable_snippets=true&text={profession}&page={page}'.format(
+        page=page, profession=profession)
+    data = session.get(url)
+    return data.text
 
 
-def parse_user_datafile_bs(filename):
+def parse_vacation(profession=None, page=0):
     results = []
-    text = read_file(filename)
+    text = load_vacancy_page(session, profession=profession, page=page)
+    soup = BeautifulSoup(text, 'html.parser')
+    vacation_list = soup.find_all("div",
+                                  {'class': ['vacancy-serp-item', 'vacancy-serp-item_premium']})
+    # print(vacation_list)
 
-    soup = BeautifulSoup(text)
-
-    film_list = soup.find('div', {'class': 'profileFilmsList'})
-    items = film_list.find_all('div', {'class': ['item', 'item even']})
-    for item in items:
-        # getting movie_id
-        movie_link = item.find('div', {'class': 'nameRus'}).find('a').get('href')
-        movie_desc = item.find('div', {'class': 'nameRus'}).find('a').text
-        movie_id = re.findall('\d+', movie_link)[0]
-
-        # getting english name
-        name_eng = item.find('div', {'class': 'nameEng'}).text
-
-        # getting watch time
-        watch_datetime = item.find('div', {'class': 'date'}).text
-        date_watched, time_watched = re.match('(\d{2}\.\d{2}\.\d{4}), (\d{2}:\d{2})',
-                                              watch_datetime).groups()
-
-        # getting user rating
-        user_rating = item.find('div', {'class': 'vote'}).text
-        if user_rating:
-            user_rating = int(user_rating)
+    for item in vacation_list:
+        vacation_link = item.find('a', {'class': ['bloko-link', 'HH-LinkModifier']}).get('href')
+        vacation_desc = item.find('a', {'class': ['bloko-link', 'HH-LinkModifier']}).text
 
         results.append({
-            'movie_id': movie_id,
-            'name_eng': name_eng,
-            'date_watched': date_watched,
-            'time_watched': time_watched,
-            'user_rating': user_rating,
-            'movie_desc': movie_desc
+            'vacation': vacation_desc,
+            'vacation_link': vacation_link,
         })
-    return results
+    with open('test.csv', 'w', newline='', encoding='utf-8') as output_file:
+        writer = csv.writer(output_file)
+        for item in results:
+            print(type(item.items()))
+            # writer.writerow(','.join(item.items()))
+
+    return print('Done')
 
 
 if __name__ == '__main__':
-    parse_user_datafile_bs('test.html')
+    parse_vacation(profession='программист', page=0)
