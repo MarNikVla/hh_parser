@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup
 import requests
 import csv
 import pathlib
+from codetiming import Timer
+
 # establishing session
 session = requests.Session()
 session.headers.update({
@@ -63,4 +65,7 @@ if __name__ == '__main__':
         file.unlink()
     except:
         pass
-    list_of_vacation_to_csv(profession='программист', page=0)
+    t = Timer()
+    t.start()
+    list_of_vacation_to_csv(profession='программист', page=20)
+    t.stop()
