@@ -41,7 +41,7 @@ def contain_vacation_data(data):
     print(data != [])
     return data != []
 
-def list_of_vacation_to_csv(profession, page):
+def list_of_vacation_to_csv(profession, page=0):
     csv_columns = ['vacation', 'vacation_link']
     while True:
         data = parse_vacation(profession, page=page)
@@ -67,5 +67,5 @@ if __name__ == '__main__':
         pass
     t = Timer()
     t.start()
-    list_of_vacation_to_csv(profession='программист', page=20)
+    list_of_vacation_to_csv(profession='программист')
     t.stop()

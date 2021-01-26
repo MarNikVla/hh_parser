@@ -21,7 +21,6 @@ async def get_html(session, vacation, page):
         print('start' + str(page))
         return await res.text()
 
-
 def parse_vacation(text):
     data = []
     # print(page)
@@ -50,25 +49,26 @@ async def get_last_page(session, vacation):
     return int(last_page)
 
 
-async def write_all_pages(vacation):
+def write_vacation_to_csv(file, data):
+        csv_columns = ['vacation', 'vacation_link']
+        writer = csv.DictWriter(file, fieldnames=csv_columns)
+        # writer.writeheader()
+        for item in data:
+            writer.writerow(item)
+
+
+async def main(vacation):
     async with aiohttp.ClientSession() as session:
         last_page = await get_last_page(session, vacation)
-        # first_page = await get_html(session, vacation, page=0)
-        result = []
-        print(last_page)
-        last_page = 5
-        pages = [page for page in range(int(last_page))]
-
-        for page in enumerate(asyncio.as_completed([get_html(session, vacation, page) for page in
+        last_page = 39
+        with open('test2/test.csv', 'w', newline='', encoding='utf-8') as output_file:
+            for page in enumerate(asyncio.as_completed([get_html(session, vacation, page) for page in
                                          range(last_page)])):
-            # with open(f'test{page[0]}.html', 'w', encoding='utf-8') as output_file:
-            #     output_file.write(page[1])
-            # res = await page
+                res = await page[1]
+                parse_res = parse_vacation(res)
+                write_vacation_to_csv(output_file, parse_res)
 
-
-            result.append(await page[1])
-            print(len(result))
-        return print(str(len(result))+'Done')
+        return print('Done')
 
 
 # async def main(page, profession):
@@ -106,5 +106,5 @@ async def write_all_pages(vacation):
 loop = asyncio.get_event_loop()
 t = Timer()
 t.start()
-loop.run_until_complete(write_all_pages('программист'))
+loop.run_until_complete(main('программист'))
 t.stop()
