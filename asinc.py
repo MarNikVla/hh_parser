@@ -9,16 +9,18 @@ from codetiming import Timer
 
 import aiohttp
 
-HTML='https://spb.hh.ru/search/vacancy?L_is_autosearch=false&area=2'\
-                             '&clusters=true' \
-                             '&enable_snippets=true&text={vacation}&page={page}'
+HTML = 'https://spb.hh.ru/search/vacancy?L_is_autosearch=false&area=2' \
+       '&clusters=true' \
+       '&enable_snippets=true&text={vacation}&page={page}'
+
 
 async def get_html(session, vacation, page):
     print('start' + str(page) + vacation)
-    url= HTML.format(page=page, vacation= vacation)
+    url = HTML.format(page=page, vacation=vacation)
     async with session.get(url, ssl=False) as res:
         print('start' + str(page))
         return await res.text()
+
 
 def parse_vacation(text):
     data = []
@@ -31,7 +33,7 @@ def parse_vacation(text):
     for item in vacation_list:
         vacation_link = item.find('a', {'class': ['bloko-link', 'HH-LinkModifier']}).get('href')
         vacation_desc = item.find('a', {'class': ['bloko-link', 'HH-LinkModifier']}).text
-        #Обре
+        # Обре
         vacation_link_strip_query = vacation_link.partition('?query')[0]
         data.append({
             'vacation': vacation_desc,
@@ -39,27 +41,34 @@ def parse_vacation(text):
         })
     return data
 
+
 async def get_last_page(session, vacation):
     first_page = await get_html(session, vacation, page=0)
     soup = BeautifulSoup(first_page, 'html.parser')
     last_page = soup.find_all("a",
-                                  {'class': ['bloko-button', 'HH-Pager-Control']})[-2].get_text()
-    print(type(first_page))
-    return last_page
+                              {'class': ['bloko-button', 'HH-Pager-Control']})[-2].get_text()
+    return int(last_page)
 
 
-async def get_all_pages(vacation):
+async def write_all_pages(vacation):
     async with aiohttp.ClientSession() as session:
         last_page = await get_last_page(session, vacation)
         # first_page = await get_html(session, vacation, page=0)
-
+        result = []
         print(last_page)
-        # pages = [i for i in range(page)]
-        # # print(pages)
-        # # urls = [HTML.format(page=page, profession=vacation) for page in pages]
-        #
-        # res= await asyncio.gather(*map(get_html, itertools.repeat(session), itertools.repeat(vacation), pages))
-        # return res
+        last_page = 5
+        pages = [page for page in range(int(last_page))]
+
+        for page in enumerate(asyncio.as_completed([get_html(session, vacation, page) for page in
+                                         range(last_page)])):
+            # with open(f'test{page[0]}.html', 'w', encoding='utf-8') as output_file:
+            #     output_file.write(page[1])
+            # res = await page
+
+
+            result.append(await page[1])
+            print(len(result))
+        return print(str(len(result))+'Done')
 
 
 # async def main(page, profession):
@@ -70,23 +79,23 @@ async def get_all_pages(vacation):
 #
 #         res= await asyncio.gather(*map(get_html, itertools.repeat(session), pages))
 #         return res
-        # result = []
-        # for item in res:
-        #     result.append(parse_vacation(item))
-        #     print(len(parse_vacation(item)))
+# result = []
+# for item in res:
+#     result.append(parse_vacation(item))
+#     print(len(parse_vacation(item)))
 
 
-        # for item in enumerate(res):
-        #     with open(f'test{item[0]}.html', 'w', encoding='utf-8') as output_file:
-        #         output_file.write(item[1])
+# for item in enumerate(res):
+#     with open(f'test{item[0]}.html', 'w', encoding='utf-8') as output_file:
+#         output_file.write(item[1])
 
-        # with open('test.csv', 'a', newline='', encoding='utf-8') as output_file:
-        #     # data = parse_vacation(profession, page=page)
-        #     writer = csv.DictWriter(output_file, fieldnames=csv_columns)
-        #     # writer.writeheader()
-        #     for item in data:
-        #         writer.writerow(item)
-        # return print(res[0])
+# with open('test.csv', 'a', newline='', encoding='utf-8') as output_file:
+#     # data = parse_vacation(profession, page=page)
+#     writer = csv.DictWriter(output_file, fieldnames=csv_columns)
+#     # writer.writeheader()
+#     for item in data:
+#         writer.writerow(item)
+# return print(res[0])
 # async def test(profession='программист', page=10):
 #     res = await main(profession='программист', page=10)
 #     for item in res:
@@ -97,5 +106,5 @@ async def get_all_pages(vacation):
 loop = asyncio.get_event_loop()
 t = Timer()
 t.start()
-loop.run_until_complete(get_all_pages('программист'))
+loop.run_until_complete(write_all_pages('программист'))
 t.stop()
