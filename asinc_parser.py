@@ -56,7 +56,7 @@ async def main(vacation: str, page: int = None) -> None:
         else:
             last_page = await get_last_page(session, vacation)
 
-        with open(f'test2/{vacation}.csv', 'w', newline='', encoding='utf-8') as output_file:
+        with open(f'test/{vacation}_async.csv', 'w', newline='', encoding='utf-8') as output_file:
             for future in asyncio.as_completed([get_html(session, vacation, page) for page in
                                                 range(last_page)]):
                 parse_result = parse_vacation(await future)

@@ -4,9 +4,6 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Text
 # для определения таблицы и модели
 from sqlalchemy.ext.declarative import declarative_base
 
-# для создания отношений между таблицами
-from sqlalchemy.orm import relationship
-
 # для настроек
 from sqlalchemy import create_engine
 
