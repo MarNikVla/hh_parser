@@ -1,6 +1,6 @@
+import unicodedata
 from bs4 import BeautifulSoup
 import requests
-import csv
 from codetiming import Timer
 
 # establishing session
@@ -19,28 +19,24 @@ def get_html(url):
 
 
 def parse_single_vacation(url):
-    data = []
-    # print(page)'
-    text = get_html(url=url)
+    data = dict()
+    # print(page)
+    text = get_html(url)
     soup = BeautifulSoup(text, 'html.parser')
-    title = soup.find("h1", {'class': ['bloko-header-1'], 'data-qa':['vacancy-title']}).text
+    title = soup.find("h1", {'class': ['bloko-header-1'], 'data-qa': ['vacancy-title']}).text
     key_skills = ' '.join([x.get_text() for x in
-                    soup.find_all("div", {'class': ['skills-element', 'bloko-tag', 'bloko-tag_inline']})])
+                           soup.find_all("div",
+                                         {'class': ['skills-element', 'bloko-tag', 'bloko-tag_inline']})])
     salary = soup.find("p", {'class': ['vacancy-salary']}).text
-    description = soup.find_all("div", {'class': ['vacancy-description', 'bloko-tag', 'bloko-tag_inline']})
-    print(title)
-    print(salary)
+    description = soup.find("div", {'class': ['g-user-content'], 'data-qa': ['vacancy-description']}).text
 
-    print('sdf')
 
-    # vacation_list = soup.find_all("p",
-    #                               {'class': ['vacancy-salary']}).text
-    data.append({
-        # 'title': vacation_desc,
-        # 'key_skills': vacation_link_strip_query,
-        # 'salary': vacation_desc,
-        # 'description': vacation_link_strip_query,
-        # 'link': url,
+    data.update({
+        'title': unicodedata.normalize("NFKD", title),
+        'key_skills': unicodedata.normalize("NFKD", key_skills),
+        'salary': unicodedata.normalize("NFKD", salary),
+        'description': unicodedata.normalize("NFKD", description),
+        'link': url,
     })
     return data
 

@@ -1,5 +1,5 @@
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String, Text
+from sqlalchemy import Column, Integer, String, Text
 
 # для определения таблицы и модели
 from sqlalchemy.ext.declarative import declarative_base
@@ -16,9 +16,9 @@ class Vacancy(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column(String(150), nullable=False)
-    key_skills = Column(Text(500), nullable=True)
-    salary = Column(Integer, default=0, nullable=True)
-    description = Column(Text(500), nullable=True)
+    key_skills = Column(Text(), nullable=True)
+    salary = Column(String(150), default=0, nullable=True)
+    description = Column(Text(), nullable=True)
     link = Column(String(250), nullable=False)
 
 
