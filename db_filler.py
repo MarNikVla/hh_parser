@@ -15,12 +15,15 @@ vacancyOne = Vacancy(title="Чистый Pyth", key_skills="Дэн Бейде", 
                   description="Дэн Бейде", link = "Дэн Бейде")
 
 
-url = 'https://hh.ru/vacancy/41892877'
+url = 'https://hh.ru/vacancy/45571638'
 
 res = parse_single_vacation(url)
 print(res)
-# vacancyOne = Vacancy(**res)
+vacancyOne = Vacancy(**res)
+print(vacancyOne.)
 session.add(vacancyOne)
 session.commit()
+
+
 if __name__ == '__main__':
     pass

@@ -23,7 +23,7 @@ def get_html(vacation, page=0):
 
 def parse_vacation(vacation, page=None):
     data = []
-    print(page)
+    # print(page)
     text = get_html(vacation=vacation, page=page)
     soup = BeautifulSoup(text, 'html.parser')
     vacation_list = soup.find_all("div",

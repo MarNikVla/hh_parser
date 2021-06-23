@@ -28,8 +28,8 @@ def parse_single_vacation(url):
                            soup.find_all("div",
                                          {'class': ['skills-element', 'bloko-tag', 'bloko-tag_inline']})])
     salary = soup.find("p", {'class': ['vacancy-salary']}).text
-    description = soup.find("div", {'class': ['g-user-content'], 'data-qa': ['vacancy-description']}).text
-
+    description = soup.find("div",
+                            {'class': ['g-user-content'], 'data-qa': ['vacancy-description']}).text or None
 
     data.update({
         'title': unicodedata.normalize("NFKD", title),
@@ -39,33 +39,6 @@ def parse_single_vacation(url):
         'link': url,
     })
     return data
-
-
-#
-#
-# def get_last_page(vacation) -> int:
-#     first_page = get_html(vacation, page=0)
-#     soup = BeautifulSoup(first_page, 'html.parser')
-#     last_page = soup.find_all("a",
-#                               {'class': ['bloko-button', 'HH-Pager-Control']})[-2].get_text()
-#     return int(last_page)
-#
-#
-# def list_of_vacation_to_csv(vacation, page=None):
-#     csv_columns = ['vacation', 'vacation_link']
-#     if page:
-#         last_page = page
-#     else:
-#         last_page = get_last_page(vacation)
-#
-#     with open(f'test/{vacation}_sync.csv', 'w', newline='', encoding='utf-8') as output_file:
-#         writer = csv.DictWriter(output_file, fieldnames=csv_columns)
-#         for page in range(last_page):
-#             data = parse_vacation(vacation, page)
-#             for item in data:
-#                 writer.writerow(item)
-#
-#     return print('Done')
 
 
 if __name__ == '__main__':
