@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import csv
 from codetiming import Timer
+from pathlib import Path
 
 # establishing session
 session = requests.Session()
@@ -48,14 +49,19 @@ def get_last_page(vacation) -> int:
     return int(last_page)
 
 
-def list_of_vacation_to_csv(vacation, page=None):
+def list_of_vacation_to_csv(vacation, path_to_save:str = 'test',  page=None):
     csv_columns = ['vacation', 'vacation_link']
     if page:
         last_page = page
     else:
         last_page = get_last_page(vacation)
 
-    with open(f'test/{vacation}_sync.csv', 'w', newline='', encoding='utf-8') as output_file:
+    path_dir = path_to_save
+    file_name = f'{vacation}_sync.csv'
+    Path(path_dir).mkdir(parents=True, exist_ok=True)
+    path_to_write = Path(path_dir, file_name)
+
+    with open(path_to_write, 'w', newline='', encoding='utf-8') as output_file:
         writer = csv.DictWriter(output_file, fieldnames=csv_columns)
         for page in range(last_page):
             data = parse_vacation(vacation, page)

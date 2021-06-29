@@ -29,7 +29,7 @@ def parse_single_vacation(url):
                                          {'class': ['skills-element', 'bloko-tag', 'bloko-tag_inline']})])
     salary = soup.find("p", {'class': ['vacancy-salary']}).text
     description = soup.find("div",
-                            {'class': ['g-user-content'], 'data-qa': ['vacancy-description']}).text or None
+                            {'data-qa': ['vacancy-description']}).text or None
 
     data.update({
         'title': unicodedata.normalize("NFKD", title),

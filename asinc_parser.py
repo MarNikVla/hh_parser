@@ -1,8 +1,9 @@
 import asyncio
 import csv
+from pathlib import Path
+from typing import TextIO, List
 
 from aiohttp import ClientSession
-from typing import TextIO, List
 from bs4 import BeautifulSoup
 from codetiming import Timer
 
@@ -49,14 +50,19 @@ def write_vacation_to_csv(file: TextIO, data: List) -> None:
         writer.writerow(item)
 
 
-async def main(vacation: str, page: int = None) -> None:
+async def main(vacation: str, path_to_save: str = 'test', page: int = None) -> None:
     async with ClientSession() as session:
         if page:
             last_page = page
         else:
             last_page = await get_last_page(session, vacation)
 
-        with open(f'test/{vacation}_async.csv', 'w', newline='', encoding='utf-8') as output_file:
+        path_dir = path_to_save
+        file_name = f'{vacation}_async.csv'
+        Path(path_dir).mkdir(parents=True, exist_ok=True)
+        path_to_write = Path(path_dir, file_name)
+
+        with open(path_to_write, 'w', newline='', encoding='utf-8') as output_file:
             for future in asyncio.as_completed([get_html(session, vacation, page) for page in
                                                 range(last_page)]):
                 parse_result = parse_vacation(await future)
@@ -65,5 +71,5 @@ async def main(vacation: str, page: int = None) -> None:
 
 TIMER.start()
 loop = asyncio.get_event_loop()
-loop.run_until_complete(main('программист', page=3))
+loop.run_until_complete(main('программист',  page=3))
 TIMER.stop()

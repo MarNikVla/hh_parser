@@ -1,29 +1,34 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from db_setup import Base, Vacancy
+from db_settings import Vacancy, Base
 from parse_single_vacation import parse_single_vacation
 
-engine = create_engine('sqlite:///vacancy-collection.db', echo=True)
-Base.metadata.bind = engine
+def fill_db(vacation_data, vacancy = None):
 
-DBSession = sessionmaker(bind=engine)
+    engine = create_engine(f'sqlite:///vacancy-{vacancy}.db')
+    Base.metadata.create_all(engine)
 
-session = DBSession()
+    DBSession = sessionmaker(bind=engine)
 
+    session = DBSession()
 
-vacancyOne = Vacancy(title="Чистый Pyth", key_skills="Дэн Бейде", salary=str(565),
-                  description="Дэн Бейде", link = "Дэн Бейде")
+    url = 'https://hh.ru/vacancy/45571638'
 
+    res = parse_single_vacation(url)
+    # print(res)
+    # vacancyOne = Vacancy(**res)
+    # print(vacancyOne)
+    session.add(vacation_data)
+    session.commit()
 
-url = 'https://hh.ru/vacancy/45571638'
+def make_vacation_data(url):
+    res = parse_single_vacation(url)
+    vacancyOne = Vacancy(**res)
 
-res = parse_single_vacation(url)
-print(res)
-vacancyOne = Vacancy(**res)
-print(vacancyOne.)
-session.add(vacancyOne)
-session.commit()
-
+    return vacancyOne
 
 if __name__ == '__main__':
-    pass
+    # url = 'https://hh.ru/vacancy/45571638'
+    url = 'https://hh.ru/vacancy/45571638'
+    data = make_vacation_data(url)
+    fill_db(data, 'программист')
