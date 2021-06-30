@@ -29,6 +29,6 @@ def make_vacation_data(url):
 
 if __name__ == '__main__':
     # url = 'https://hh.ru/vacancy/45571638'
-    url = 'https://hh.ru/vacancy/45571111'
+    url = 'https://hh.ru/vacancy/45571633ываыва'
     data = make_vacation_data(url)
     fill_db(data, 'программист')

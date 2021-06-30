@@ -9,6 +9,8 @@ requests = "*"
 aiohttp = "*"
 codetiming = "*"
 sqlalchemy = "*"
+celery = "*"
+redis = "*"
 
 [dev-packages]
 
