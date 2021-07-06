@@ -1,34 +1,34 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from db_settings import Vacancy, Base
-from parse_single_vacation import parse_single_vacation
+from parse_single_vacancy import parse_single_vacancy
 
-def fill_db(vacation_data, vacancy = None):
-    if vacation_data:
 
-        engine = create_engine(f'sqlite:///vacancy-{vacancy}.db')
+def fill_SQlite_db(vacancy_data: Vacancy, vacancy='test_db'):
+    if vacancy_data:
+        engine = create_engine(f'sqlite:///vacancy_{vacancy}.db')
         Base.metadata.create_all(engine)
 
         DBSession = sessionmaker(bind=engine)
 
         session = DBSession()
 
-        session.add(vacation_data)
+        session.add(vacancy_data)
         session.commit()
 
-def make_vacation_data(url):
+
+def make_vacancy_data(url: str) -> Vacancy or list:
     try:
-        vacancyOne = Vacancy(**parse_single_vacation(url))
+        vacancy = Vacancy(**parse_single_vacancy(url))
     except AttributeError as e:
-        print(e)
+        # print(e)
         return []
+    return vacancy
 
-    # vacancyOne = Vacancy(**res)
+def vacancy_to_SQlite(url, vacancy):
+    data = make_vacancy_data(url)
+    fill_SQlite_db(data, vacancy)
 
-    return vacancyOne
 
 if __name__ == '__main__':
-    # url = 'https://hh.ru/vacancy/45571638'
-    url = 'https://hh.ru/vacancy/45571633'
-    data = make_vacation_data(url)
-    fill_db(data, 'программист')
+    pass

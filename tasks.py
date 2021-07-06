@@ -1,11 +1,10 @@
 from celery import Celery
-from db_filler import make_vacation_data, fill_db
-
+from db_filler import vacancy_to_SQlite
 
 app = Celery('tasks', broker='redis://localhost')
 
+
 @app.task(expires=120)
-def db_fill(url):
-    data = make_vacation_data(url)
-    fill_db(data, 'test')
+def db_fill_task(url, vacancy='test_db'):
+    vacancy_to_SQlite(url, vacancy)
     return 'Done'

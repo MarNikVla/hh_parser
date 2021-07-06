@@ -13,24 +13,24 @@ HH_PATTERN_HTML = 'https://spb.hh.ru/search/vacancy?L_is_autosearch=false&area=2
                   '&enable_snippets=true&text={vacation}&page={page}'
 
 
-async def get_html(session: ClientSession, vacation: str, page: int) -> str:
-    url = HH_PATTERN_HTML.format(page=page, vacation=vacation)
+async def get_html(session: ClientSession, vacancy: str, page: int) -> str:
+    url = HH_PATTERN_HTML.format(page=page, vacancy=vacancy)
     async with session.get(url, ssl=False) as res:
         return await res.text()
 
 
-def parse_vacation(html_page: str) -> List:
+def parse_vacancy(html_page: str) -> List:
     data = []
     soup = BeautifulSoup(html_page, 'html.parser')
-    vacation_list = soup.find_all("div",
+    vacancy_list = soup.find_all("div",
                                   {'class': ['vacancy-serp-item', 'vacancy-serp-item_premium']})
-    for item in vacation_list:
-        vacation_link = item.find('a', {'class': ['bloko-link', 'HH-LinkModifier']}).get('href')
-        vacation_desc = item.find('a', {'class': ['bloko-link', 'HH-LinkModifier']}).text
-        vacation_link_strip_query = vacation_link.partition('?query')[0]
+    for item in vacancy_list:
+        vacancy_link = item.find('a', {'class': ['bloko-link', 'HH-LinkModifier']}).get('href')
+        vacancy_desc = item.find('a', {'class': ['bloko-link', 'HH-LinkModifier']}).text
+        vacancy_link_strip_query = vacancy_link.partition('?query')[0]
         data.append({
-            'vacation': vacation_desc,
-            'vacation_link': vacation_link_strip_query,
+            'vacancy': vacancy_desc,
+            'vacancy_link': vacancy_link_strip_query,
         })
     return data
 
@@ -43,30 +43,30 @@ async def get_last_page(session: ClientSession, vacation: str) -> int:
     return int(last_page)
 
 
-def write_vacation_to_csv(file: TextIO, data: List) -> None:
-    csv_columns = ['vacation', 'vacation_link']
+def write_vacancy_to_csv(file: TextIO, data: List) -> None:
+    csv_columns = ['vacancy', 'vacancy_link']
     writer = csv.DictWriter(file, fieldnames=csv_columns)
     for item in data:
         writer.writerow(item)
 
 
-async def main(vacation: str, path_to_save: str = 'test', page: int = None) -> None:
+async def main(vacancy: str, path_to_save: str = 'test', page: int = None) -> None:
     async with ClientSession() as session:
         if page:
             last_page = page
         else:
-            last_page = await get_last_page(session, vacation)
+            last_page = await get_last_page(session, vacancy)
 
         path_dir = path_to_save
-        file_name = f'{vacation}_async.csv'
+        file_name = f'{vacancy}_async.csv'
         Path(path_dir).mkdir(parents=True, exist_ok=True)
         path_to_write = Path(path_dir, file_name)
 
         with open(path_to_write, 'w', newline='', encoding='utf-8') as output_file:
-            for future in asyncio.as_completed([get_html(session, vacation, page) for page in
+            for future in asyncio.as_completed([get_html(session, vacancy, page) for page in
                                                 range(last_page)]):
-                parse_result = parse_vacation(await future)
-                write_vacation_to_csv(output_file, parse_result)
+                parse_result = parse_vacancy(await future)
+                write_vacancy_to_csv(output_file, parse_result)
         return print('Done')
 
 TIMER.start()
