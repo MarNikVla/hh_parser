@@ -9,8 +9,10 @@ requests = "*"
 aiohttp = "*"
 codetiming = "*"
 sqlalchemy = "*"
-celery = "*"
+celery = "==4.4.7"
 redis = "*"
+flower = "*"
+vine = "==1.3.0"
 
 [dev-packages]
 
