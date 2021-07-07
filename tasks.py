@@ -7,4 +7,4 @@ app = Celery('tasks', broker='redis://localhost')
 @app.task(expires=120)
 def db_fill_task(url, vacancy='test_db'):
     vacancy_to_SQlite(url, vacancy)
-    return 'Done'
+    return 'db_fill_task - Done'
