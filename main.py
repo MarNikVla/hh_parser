@@ -1,4 +1,5 @@
 import argparse
+import subprocess
 
 from db_filler import vacancy_to_SQlite
 from sync_parser import url_of_vacancies_to_list
@@ -26,6 +27,7 @@ def main(args):
     urls = url_of_vacancies_to_list(vacancy, num_of_pages)
 
     if celery:
+        subprocess.run('celery -A tasks worker -P solo --loglevel=info')
         for url in urls:
             db_fill_task.delay(url, vacancy)
     else:
