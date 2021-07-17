@@ -1,3 +1,5 @@
+
+
 from celery import Celery
 from db_filler import vacancy_to_SQlite
 

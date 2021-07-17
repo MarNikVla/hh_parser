@@ -1,3 +1,7 @@
+"""
+    Module contain functions for parsing single vacancy from hh.ru
+"""
+
 import unicodedata
 from bs4 import BeautifulSoup
 import requests
@@ -10,14 +14,11 @@ session.headers.update({
 })
 
 
-def get_html(url):
-    html = session.get(url).text
-    return html
-
-
-def parse_single_vacancy(url):
+# Take vacancy url, return dict with
+# dict.keys = (title', 'key_skills', 'salary'. 'description'. 'link')
+def parse_single_vacancy(url) -> dict:
     data = dict()
-    text = get_html(url)
+    text = session.get(url).text
     soup = BeautifulSoup(text, 'html.parser')
     title = soup.find("h1", {'class': ['bloko-header-1'], 'data-qa': ['vacancy-title']}).text
     key_skills = ' '.join([x.get_text() for x in soup.find_all("div", {
@@ -36,8 +37,8 @@ def parse_single_vacancy(url):
     return data
 
 
-if __name__ == '__main__':
-    t = Timer()
-    t.start()
-    parse_single_vacancy('https://hh.ru/vacancy/41892897')
-    t.stop()
+# if __name__ == '__main__':
+#     t = Timer()
+#     t.start()
+#     parse_single_vacancy('https://hh.ru/vacancy/41892897')
+#     t.stop()

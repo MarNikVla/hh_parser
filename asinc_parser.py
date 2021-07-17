@@ -1,3 +1,8 @@
+"""
+    Module only for exercise, not used in main.py script
+    but works for async writing ['vacancy', 'vacancy_link'] to csv file
+"""
+
 import asyncio
 import csv
 from pathlib import Path
@@ -10,7 +15,7 @@ from codetiming import Timer
 TIMER = Timer()
 HH_PATTERN_HTML = 'https://spb.hh.ru/search/vacancy?L_is_autosearch=false&area=2' \
                   '&clusters=true' \
-                  '&enable_snippets=true&text={vacation}&page={page}'
+                  '&enable_snippets=true&text={vacancy}&page={page}'
 
 
 async def get_html(session: ClientSession, vacancy: str, page: int) -> str:
@@ -18,8 +23,8 @@ async def get_html(session: ClientSession, vacancy: str, page: int) -> str:
     async with session.get(url, ssl=False) as res:
         return await res.text()
 
-
-def parse_vacancy(html_page: str) -> List:
+# Parse hh.ru html_page to list ['vacancy', 'vacancy_link']
+def parse_vacancy_page(html_page: str) -> List:
     data = []
     soup = BeautifulSoup(html_page, 'html.parser')
     vacancy_list = soup.find_all("div",
@@ -35,8 +40,8 @@ def parse_vacancy(html_page: str) -> List:
     return data
 
 
-async def get_last_page(session: ClientSession, vacation: str) -> int:
-    first_page = await get_html(session, vacation, page=0)
+async def get_last_page(session: ClientSession, vacancy: str) -> int:
+    first_page = await get_html(session, vacancy, page=0)
     soup = BeautifulSoup(first_page, 'html.parser')
     last_page = soup.find_all("a",
                               {'class': ['bloko-button', 'HH-Pager-Control']})[-2].get_text()
@@ -49,7 +54,7 @@ def write_vacancy_to_csv(file: TextIO, data: List) -> None:
     for item in data:
         writer.writerow(item)
 
-
+# Main logic is here
 async def main(vacancy: str, path_to_save: str = 'test', page: int = None) -> None:
     async with ClientSession() as session:
         if page:
@@ -65,10 +70,12 @@ async def main(vacancy: str, path_to_save: str = 'test', page: int = None) -> No
         with open(path_to_write, 'w', newline='', encoding='utf-8') as output_file:
             for future in asyncio.as_completed([get_html(session, vacancy, page) for page in
                                                 range(last_page)]):
-                parse_result = parse_vacancy(await future)
+                parse_result = parse_vacancy_page(await future)
                 write_vacancy_to_csv(output_file, parse_result)
         return print('Done')
 
+
+# The example below works
 TIMER.start()
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main('программист',  page=3))

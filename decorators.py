@@ -1,6 +1,7 @@
 from codetiming import Timer
 
 
+# Just simple decorator fo evaluate execution time
 def execution_time_decorator(func):
     timer = Timer()
 

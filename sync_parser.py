@@ -1,3 +1,7 @@
+"""
+    Module contain functions for sync parsing pages of vacancy from hh.ru
+"""
+
 from typing import List, Dict, Any
 
 from bs4 import BeautifulSoup
@@ -20,10 +24,9 @@ def get_html(vacancy: str, page: int = 0) -> str:
     html = session.get(url).text
     return html
 
-
+# Parse hh.ru html_page to list ['vacancy', 'vacancy_link']
 def parse_vacancy(vacancy: str, page: int = None) -> List[Dict[str, Any]]:
     data = []
-    # print(page)
     text = get_html(vacancy=vacancy, page=page)
     soup = BeautifulSoup(text, 'html.parser')
     vacancies_list = soup.find_all("div",
@@ -47,9 +50,8 @@ def get_last_page(vacancy) -> int:
                               {'class': ['bloko-button', 'HH-Pager-Control']})[-2].get_text()
     return int(last_page)
 
-
+# Make list of urls of giving vacancy
 def url_of_vacancies_to_list(vacancy: str, amount_pages: int = 3) -> List[str]:
-    csv_columns = ['vacancy', 'vacancy_link']
     if amount_pages:
         last_page = amount_pages
     else:
@@ -58,18 +60,7 @@ def url_of_vacancies_to_list(vacancy: str, amount_pages: int = 3) -> List[str]:
     list_of_urls = list()
     for page in range(last_page):
         data = parse_vacancy(vacancy, page)
-        # print(data)
         for item in data:
             list_of_urls.append(item['vacancy_link'])
-        # for item in data:
-        #     writer.writerow(item)
 
     return list_of_urls
-
-
-if __name__ == '__main__':
-    pass
-    # t = Timer()
-    # t.start()
-    # print(url_of_vacancies_to_list('программист', amount_pages=2))
-    # t.stop()

@@ -7,15 +7,10 @@ import os
 
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': pass
     # argv = ['worker', '--loglevel=info', '--pool=solo']
     # app.worker_main(argv)
     # args = ['celery -A tasks worker -P solo --loglevel=info']
-
-    process = subprocess.Popen('celery -A tasks worker -P solo --loglevel=info', stdout=sys.stdout)
-    process.wait(20)
-    print('fdfdf')
-
     # subprocess.run('celery -A tasks worker -P solo --loglevel=info')
     # os.system('celery -A tasks worker -P solo --loglevel=info')
     # populate_db('токарь',1)
